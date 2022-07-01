@@ -34,7 +34,12 @@ public class MovetoManager : MonoBehaviour
 
         }
 
-        sample.SetValue("bool", dragObject.released);
-        writer.Write(sample);
+        if (dragObject.released == true)
+        {
+            Debug.Log("true");
+            sample.SetValue("bool", true);
+            writer.Write(sample);
+        }
+
     }
 }
