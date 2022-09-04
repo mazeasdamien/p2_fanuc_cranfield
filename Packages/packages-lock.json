@@ -8,7 +8,7 @@
       "url": "https://package.openupm.com"
     },
     "com.ultraleap.tracking": {
-      "version": "5.12.1",
+      "version": "6.0.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {},
@@ -310,7 +310,7 @@
       "hash": "f3d9c5ac24aca19504da8391001771fd5c4f29e3"
     },
     "io.realm.unity": {
-      "version": "10.14.0",
+      "version": "10.15.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {},
