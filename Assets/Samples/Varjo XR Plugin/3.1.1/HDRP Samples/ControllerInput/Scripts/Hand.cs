@@ -7,6 +7,9 @@ namespace VarjoExample
     public class Hand : MonoBehaviour
     {
         public Transform xrRig;
+        public GameObject pointcloud;
+        public GameObject PCorigin;
+        public GameObject tempo;
 
         Controller controller;
 
@@ -15,6 +18,8 @@ namespace VarjoExample
         private FixedJoint fixedJoint = null;
         private Interactable currentInteractable;
         private Rigidbody heldObjectBody;
+
+        public MovetoManager dropped;
 
         void Awake()
         {
@@ -58,6 +63,11 @@ namespace VarjoExample
 
         public void Pick()
         {
+            pointcloud.transform.SetParent(tempo.transform);
+            foreach (Interactable i in contactedInteractables)
+            {
+                i.gameObject.GetComponent<Rigidbody>().isKinematic = false;
+            }
             currentInteractable = GetNearestInteractable();
 
             if (!currentInteractable)
@@ -81,6 +91,15 @@ namespace VarjoExample
 
         public void Drop()
         {
+            pointcloud.transform.SetParent(PCorigin.transform);
+
+            foreach (Interactable i in contactedInteractables)
+            {
+                i.gameObject.GetComponent<Rigidbody>().isKinematic = true;
+            }
+
+            dropped.sendDropped = true;
+
             if (!currentInteractable)
                 return;
 
@@ -95,8 +114,15 @@ namespace VarjoExample
             // Clear
             currentInteractable.activeHand = null;
             currentInteractable = null;
-        }
 
+            //Invoke("FollowPC",3);
+        }
+        /*
+        void FollowPC()
+        {
+            pointcloud.transform.SetParent(PCorigin.transform);
+        }
+        */
         private Interactable GetNearestInteractable()
         {
             Interactable nearest = null;

@@ -6,10 +6,11 @@ using UnityEngine;
 public class MovetoManager : MonoBehaviour
 {
     private DDSHandler dDSHandler;
-    public DragObject dragObject;
     private protected DataWriter<DynamicData> writer { get; private set; }
     private DynamicData sample = null;
     private bool init = false;
+
+    public bool sendDropped;
 
     private void Start()
     {
@@ -34,11 +35,12 @@ public class MovetoManager : MonoBehaviour
 
         }
 
-        if (dragObject.released == true)
+        if (sendDropped == true)
         {
             Debug.Log("true");
             sample.SetValue("bool", true);
             writer.Write(sample);
+            sendDropped = false;
         }
 
     }

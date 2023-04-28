@@ -44,6 +44,7 @@ public class FanucManager : MonoBehaviour
             reader = dDSHandler.SetupDataReader("RobotState_Topic", RobotState);
         }
 
+
         ProcessData(reader);
     }
 
@@ -67,6 +68,7 @@ public class FanucManager : MonoBehaviour
         using var samples = reader.Take();
         foreach (var sample in samples)
         {
+
             if (sample.Info.ValidData)
             {
                 DynamicData data = sample.Data;
@@ -100,5 +102,6 @@ public class FanucManager : MonoBehaviour
                 joints[5].xDrive = J6drive;
             }
         }
+
     }
 }
