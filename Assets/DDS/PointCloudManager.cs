@@ -5,40 +5,50 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.VFX;
 
+// The PointCloudManager class handles DDS communication and updates a point cloud visualization in Unity.
 public class PointCloudManager : MonoBehaviour
 {
-    public VisualEffect effect;
+    public VisualEffect effect; // Reference to the Visual Effect Graph component for point cloud visualization.
 
-    Mesh mesh;
-    readonly List<Vector3> vertices = new();
-    readonly List<Color32> colors = new();
-    readonly List<int> indices = new();
+    Mesh mesh; // Mesh object for storing point cloud geometry.
+    readonly List<Vector3> vertices = new List<Vector3>(); // List to store point cloud vertices.
+    readonly List<Color32> colors = new List<Color32>(); // List to store point cloud colors.
+    readonly List<int> indices = new List<int>(); // List to store point cloud indices.
 
-    private bool init = false;
+    private bool init = false; // Flag to ensure initialization only occurs once.
 
-    private DDSHandler dDSHandler;
-    private protected DataReader<DynamicData> reader { get; private set; }
+    private DDSHandler dDSHandler; // Reference to the DDSHandler component for DDS communication.
+    private protected DataReader<DynamicData> reader { get; private set; } // DDS DataReader for dynamic data.
 
+    // Called when the script starts. Initializes the DDSHandler reference.
     private void Start()
     {
         dDSHandler = gameObject.GetComponent<DDSHandler>();
     }
-    // Update is called once per frame
+
+    // Called every frame. Sets up DDS data structures on the first frame and updates point cloud visualization.
     private void Update()
     {
         if (!init)
         {
             init = true;
+
+            // DynamicType setup for the "PointCloud" data structure.
             var typeFactory = DynamicTypeFactory.Instance;
             StructType PointCloud = typeFactory.BuildStruct()
                 .WithName("PointCloud")
                 .AddMember(new StructMember("sequence_Memory", typeFactory.CreateSequence(typeFactory.GetPrimitiveType<float>(), 600000)))
                 .Create();
+
+            // Setup DDS DataReader for the "PointCloud_Topic".
             reader = dDSHandler.SetupDataReader("PointCloud_Topic", PointCloud);
         }
+
+        // Process incoming DDS data and update point cloud visualization.
         ProcessData(reader);
     }
 
+    // Processes DDS data received from the DataReader and updates point cloud visualization.
     void ProcessData(AnyDataReader anyReader)
     {
         var reader = (DataReader<DynamicData>)anyReader;
@@ -47,9 +57,9 @@ public class PointCloudManager : MonoBehaviour
         {
             if (sample.Info.ValidData)
             {
-                Debug.Log(sample.Info);
                 DynamicData data = sample.Data;
 
+                // Clear existing point cloud data.
                 vertices.Clear();
                 colors.Clear();
                 indices.Clear();
@@ -58,9 +68,11 @@ public class PointCloudManager : MonoBehaviour
                     indexFormat = UnityEngine.Rendering.IndexFormat.UInt32,
                 };
 
+                // Retrieve point cloud data from DDS sample.
                 float[] buffer = data.GetValue<float[]>("sequence_Memory");
-                //Debug.Log(buffer.Length);
                 int num = buffer.Length / 6;
+
+                // Create indices for the point cloud mesh.
                 for (int i = 0; i < num; i++)
                 {
                     indices.Add(i);
@@ -71,6 +83,7 @@ public class PointCloudManager : MonoBehaviour
 
                 mesh.SetIndices(indices, MeshTopology.Points, 0);
 
+                // Populate vertices and colors from DDS sample data.
                 for (int i = 0; i < buffer.Length; i += 6)
                 {
                     vertices.Add(new Vector3
@@ -89,8 +102,11 @@ public class PointCloudManager : MonoBehaviour
                     });
                 }
 
+                // Update the mesh with the new point cloud data.
                 mesh.vertices = vertices.ToArray();
                 mesh.colors32 = colors.ToArray();
+
+                // Set the updated mesh in the Visual Effect Graph.
                 effect.SetMesh("RemoteData", mesh);
             }
         }
