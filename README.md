@@ -1,7 +1,5 @@
 # Fanuc Remote Control Framework for Unity
 
-![Unity Logo](https://unity3d.com/profiles/unity3d/themes/unity/images/company/brand/logos/primary/unity-logo-white.png)
-
 ## Overview
 
 This repository contains a Unity application for remotely controlling a Fanuc robotic system. The communication between Unity and the Fanuc system is facilitated through the Data Distribution Service (DDS) protocol. The application provides various functionalities such as joint angle control, object movement, point cloud visualization, and reachability feedback.
